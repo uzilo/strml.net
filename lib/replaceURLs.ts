@@ -15,7 +15,10 @@ export function regexReplace(message: string, regex: RegExp, replace: string | (
   const match = message.match(regex);
   if (match && match.length) {
     for (let i = 0; i < match.length; i++) {
-      message = message.replace(match[i], (typeof replace === 'function' ? replace(match[i]) : replace));
+      const matchItem = match[i];
+      if (matchItem) {
+        message = message.replace(matchItem, (typeof replace === 'function' ? replace(matchItem) : replace));
+      }
     }
   }
   return message;

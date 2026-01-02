@@ -16,7 +16,7 @@ import styles1 from './styles1.css?raw';
 import styles2 from './styles2.css?raw';
 import styles3 from './styles3.css?raw';
 
-let styleText = [styles0, styles1, styles2, styles3];
+let styleText: string[] = [styles0, styles1, styles2, styles3];
 
 // Simple delay utility to replace Bluebird's Promise.delay
 const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
@@ -46,14 +46,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function startAnimation(): Promise<void> {
   try {
-    await writeTo(styleEl, styleText[0], 0, speed, true, 1);
+    await writeTo(styleEl, styleText[0]!, 0, speed, true, 1);
     await writeTo(workEl, workText, 0, speed, false, 1);
-    await writeTo(styleEl, styleText[1], 0, speed, true, 1);
+    await writeTo(styleEl, styleText[1]!, 0, speed, true, 1);
     createWorkBox();
     await delay(1000);
-    await writeTo(styleEl, styleText[2], 0, speed, true, 1);
+    await writeTo(styleEl, styleText[2]!, 0, speed, true, 1);
     await writeTo(pgpEl, pgpText, 0, speed, false, 32);
-    await writeTo(styleEl, styleText[3], 0, speed, true, 1);
+    await writeTo(styleEl, styleText[3]!, 0, speed, true, 1);
   }
   // Flow control straight from the ghettos of Milwaukee
   catch(e) {
@@ -77,7 +77,10 @@ async function surprisinglyShortAttentionSpan(): Promise<void> {
   style.textContent += txt;
   let styleHTML = "";
   for(let i = 0; i < txt.length; i++) {
-     styleHTML = handleChar(styleHTML, txt[i]);
+    const char = txt[i];
+    if (char) {
+      styleHTML = handleChar(styleHTML, char);
+    }
   }
   styleEl.innerHTML = styleHTML;
   createWorkBox();
@@ -154,7 +157,12 @@ function getEls(): void {
   // We're cheating a bit on styles.
   let preStyleEl = document.createElement('style');
   preStyleEl.textContent = preStyles;
-  document.head.insertBefore(preStyleEl, document.getElementsByTagName('style')[0]);
+  const firstStyle = document.getElementsByTagName('style')[0];
+  if (firstStyle) {
+    document.head.insertBefore(preStyleEl, firstStyle);
+  } else {
+    document.head.appendChild(preStyleEl);
+  }
 
   // El refs
   style = document.getElementById('style-tag') as HTMLStyleElement;
@@ -212,8 +220,8 @@ function createWorkBox(): void {
   workEl.scrollTop = 9999;
 
   // flippy floppy
-  let flipping = 0;
-  mouseWheel(workEl, async function(dx: number, dy: number) {
+  let flipping = false;
+  mouseWheel(workEl, async function(_dx: number, dy: number) {
     if (flipping) return;
     let flipped = workEl.classList.contains('flipped');
     let half = (workEl.scrollHeight - workEl.clientHeight) / 2;
