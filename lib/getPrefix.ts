@@ -1,4 +1,3 @@
-// @flow
 export default function generatePrefix(): string {
   // Checking specifically for 'window.document' is for pseudo-browser server-side
   // environments that define 'window' as the global context.
@@ -13,10 +12,10 @@ export default function generatePrefix(): string {
   }
 
   for (let i = 0; i < prefixes.length; ++i) {
-    if (prefixes[i] + 'Transform' in style) {
-      return prefixes[i];
+    const prefix = prefixes[i];
+    if (prefix && prefix + 'Transform' in style) {
+      return prefix;
     }
   }
   return '';
 }
-

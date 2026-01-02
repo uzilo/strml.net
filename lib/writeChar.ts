@@ -1,7 +1,7 @@
 let styleBuffer = '';
-const fullTextStorage = {};
+const fullTextStorage: Record<string, string> = {};
 
-export default function writeChar(el, char, style){
+export default function writeChar(el: HTMLElement, char: string, style: HTMLStyleElement): void {
   // Grab text. We buffer it in storage so we don't have to read from the DOM every iteration.
   let fullText = fullTextStorage[el.id];
   if (!fullText) fullText = fullTextStorage[el.id] = el.innerHTML;
@@ -16,11 +16,11 @@ export default function writeChar(el, char, style){
     style.textContent += styleBuffer;
     styleBuffer = '';
   }
-};
+}
 
-export function writeSimpleChar(el, char) {
+export function writeSimpleChar(el: HTMLElement, char: string): void {
   el.innerHTML += char;
-};
+}
 
 let openComment = false;
 const commentRegex = /(\/\*(?:[^](?!\/\*))*\*)$/;
@@ -30,7 +30,7 @@ const selectorRegex = /(.*)$/;
 const pxRegex = /\dp/;
 const pxRegex2 = /p$/;
 
-export function handleChar(fullText, char) {
+export function handleChar(fullText: string, char: string): string {
   if (openComment && char !== '/') {
     // Short-circuit during a comment so we don't highlight inside it.
     fullText += char;

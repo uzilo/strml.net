@@ -1,0 +1,26 @@
+{
+  "name": "STRML Portfolio",
+  "short_name": "STRML",
+  "description": "Samuel Reed's portfolio website with interactive self-typing code animation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#3f5263",
+  "theme_color": "#3f5263",
+  "icons": [
+    {
+      "src": "/ico/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/ico/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/ico/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ]
+}
