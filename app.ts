@@ -1,22 +1,39 @@
 import 'classlist-polyfill';
-import Promise from 'bluebird';
 import Markdown from 'markdown';
 const md = Markdown.markdown.toHTML;
-import workText from 'raw-loader!./work.txt';
-import pgpText from 'raw-loader!./pgp.txt';
-import headerHTML from 'raw-loader!./header.html';
-let styleText = [0, 1, 2, 3].map((i) => require('raw-loader!./styles' + i + '.css').default);
-import preStyles from 'raw-loader!./prestyles.css';
+import workText from './work.txt?raw';
+import pgpText from './pgp.txt?raw';
+import headerHTML from './header.html?raw';
+import preStyles from './prestyles.css?raw';
 import replaceURLs from './lib/replaceURLs';
 import {default as writeChar, writeSimpleChar, handleChar} from './lib/writeChar';
 import getPrefix from './lib/getPrefix';
+import mouseWheel from 'mouse-wheel';
+
+// Import CSS files as raw strings for Vite
+import styles0 from './styles0.css?raw';
+import styles1 from './styles1.css?raw';
+import styles2 from './styles2.css?raw';
+import styles3 from './styles3.css?raw';
+
+let styleText = [styles0, styles1, styles2, styles3];
+
+// Simple delay utility to replace Bluebird's Promise.delay
+const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 // Vars that will help us get er done
 const isDev = window.location.hostname === 'localhost';
 const speed = isDev ? 0 : 16;
-let style, styleEl, workEl, pgpEl, skipAnimationEl, pauseEl;
-let animationSkipped = false, done = false, paused = false;
-let browserPrefix;
+let style: HTMLStyleElement;
+let styleEl: HTMLPreElement;
+let workEl: HTMLPreElement;
+let pgpEl: HTMLPreElement;
+let skipAnimationEl: HTMLAnchorElement;
+let pauseEl: HTMLAnchorElement;
+let animationSkipped = false;
+let done = false;
+let paused = false;
+let browserPrefix: string;
 
 // Wait for load to get started.
 document.addEventListener("DOMContentLoaded", function() {
@@ -27,20 +44,20 @@ document.addEventListener("DOMContentLoaded", function() {
   startAnimation();
 });
 
-async function startAnimation() {
+async function startAnimation(): Promise<void> {
   try {
     await writeTo(styleEl, styleText[0], 0, speed, true, 1);
     await writeTo(workEl, workText, 0, speed, false, 1);
     await writeTo(styleEl, styleText[1], 0, speed, true, 1);
     createWorkBox();
-    await Promise.delay(1000);
+    await delay(1000);
     await writeTo(styleEl, styleText[2], 0, speed, true, 1);
     await writeTo(pgpEl, pgpText, 0, speed, false, 32);
     await writeTo(styleEl, styleText[3], 0, speed, true, 1);
   }
   // Flow control straight from the ghettos of Milwaukee
   catch(e) {
-    if (e.message === "SKIP IT") {
+    if ((e as Error).message === "SKIP IT") {
       surprisinglyShortAttentionSpan();
     } else {
       throw e;
@@ -49,7 +66,7 @@ async function startAnimation() {
 }
 
 // Skips all the animations.
-async function surprisinglyShortAttentionSpan() {
+async function surprisinglyShortAttentionSpan(): Promise<void> {
   if (done) return;
   done = true;
   pgpEl.innerHTML = pgpText;
@@ -70,7 +87,7 @@ async function surprisinglyShortAttentionSpan() {
   while(Date.now() - 1000 > start) {
     workEl.scrollTop = Infinity;
     styleEl.scrollTop = pgpEl.scrollTop = Infinity;
-    await Promise.delay(16);
+    await delay(16);
   }
 }
 
@@ -83,7 +100,7 @@ let endOfSentence = /[\.\?\!]\s$/;
 let comma = /\D[\,]\s$/;
 let endOfBlock = /[^\/]\n\n$/;
 
-async function writeTo(el, message, index, interval, mirrorToStyle, charsPerInterval){
+async function writeTo(el: HTMLPreElement, message: string, index: number, interval: number, mirrorToStyle: boolean, charsPerInterval: number): Promise<void> {
   if (animationSkipped) {
     // Lol who needs proper flow control
     throw new Error('SKIP IT');
@@ -111,7 +128,7 @@ async function writeTo(el, message, index, interval, mirrorToStyle, charsPerInte
     if (endOfSentence.test(thisSlice)) thisInterval = interval * 70;
 
     do {
-      await Promise.delay(thisInterval);
+      await delay(thisInterval);
     } while(paused);
 
     return writeTo(el, message, index, interval, mirrorToStyle, charsPerInterval);
@@ -122,7 +139,7 @@ async function writeTo(el, message, index, interval, mirrorToStyle, charsPerInte
 // Older versions of major browsers (like Android) still use prefixes. So we figure out what that prefix is
 // and use it.
 //
-function getBrowserPrefix() {
+function getBrowserPrefix(): void {
   // Ghetto per-browser prefixing
   browserPrefix = getPrefix(); // could be empty string, which is fine
   styleText = styleText.map(function(text) {
@@ -133,33 +150,33 @@ function getBrowserPrefix() {
 //
 // Put els into the module scope.
 //
-function getEls() {
+function getEls(): void {
   // We're cheating a bit on styles.
   let preStyleEl = document.createElement('style');
   preStyleEl.textContent = preStyles;
   document.head.insertBefore(preStyleEl, document.getElementsByTagName('style')[0]);
 
   // El refs
-  style = document.getElementById('style-tag');
-  styleEl = document.getElementById('style-text');
-  workEl = document.getElementById('work-text');
-  pgpEl = document.getElementById('pgp-text');
-  skipAnimationEl = document.getElementById('skip-animation');
-  pauseEl = document.getElementById('pause-resume');
+  style = document.getElementById('style-tag') as HTMLStyleElement;
+  styleEl = document.getElementById('style-text') as HTMLPreElement;
+  workEl = document.getElementById('work-text') as HTMLPreElement;
+  pgpEl = document.getElementById('pgp-text') as HTMLPreElement;
+  skipAnimationEl = document.getElementById('skip-animation') as HTMLAnchorElement;
+  pauseEl = document.getElementById('pause-resume') as HTMLAnchorElement;
 }
 
 //
 // Create links in header (now footer).
 //
-function populateHeader() {
-  let header = document.getElementById('header');
+function populateHeader(): void {
+  let header = document.getElementById('header') as HTMLDivElement;
   header.innerHTML = headerHTML;
 }
 
 //
 // Create basic event handlers for user input.
 //
-function createEventHandlers() {
+function createEventHandlers(): void {
   // Mirror user edits back to the style element.
   styleEl.addEventListener('input', function() {
     style.textContent = styleEl.textContent;
@@ -186,7 +203,7 @@ function createEventHandlers() {
 //
 // Fire a listener when scrolling the 'work' box.
 //
-function createWorkBox() {
+function createWorkBox(): void {
   if (workEl.classList.contains('flipped')) return;
   workEl.innerHTML = '<div class="text">' + replaceURLs(workText) + '</div>' +
                      '<div class="md">' + replaceURLs(md(workText)) + '<div>';
@@ -196,7 +213,7 @@ function createWorkBox() {
 
   // flippy floppy
   let flipping = 0;
-  require('mouse-wheel')(workEl, async function(dx, dy) {
+  mouseWheel(workEl, async function(dx: number, dy: number) {
     if (flipping) return;
     let flipped = workEl.classList.contains('flipped');
     let half = (workEl.scrollHeight - workEl.clientHeight) / 2;
@@ -206,7 +223,7 @@ function createWorkBox() {
     if (pastHalf) {
       workEl.classList.toggle('flipped');
       flipping = true;
-      await Promise.delay(500);
+      await delay(500);
       workEl.scrollTop = flipped ? 0 : 9999;
       flipping = false;
     }

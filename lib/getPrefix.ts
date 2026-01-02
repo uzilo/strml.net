@@ -1,4 +1,3 @@
-// @flow
 export default function generatePrefix(): string {
   // Checking specifically for 'window.document' is for pseudo-browser server-side
   // environments that define 'window' as the global context.
@@ -19,4 +18,3 @@ export default function generatePrefix(): string {
   }
   return '';
 }
-

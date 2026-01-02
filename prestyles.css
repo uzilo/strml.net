@@ -1,5 +1,13 @@
 /* I'm cheating a bit */
 
+:root {
+  --bg-primary: rgb(63, 82, 99);
+  --bg-code: rgb(48, 48, 48);
+  --text-primary: white;
+  --border-color: #ccc;
+  --shadow-color: rgba(0,0,0,0.3);
+}
+
 html, body {
   margin-top: 0;
   height: 100%;
@@ -37,4 +45,39 @@ a:after {
 
 a:last-of-type:after {
   border: none;
+}
+
+/* Skip to content link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Support light mode preference */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: rgb(240, 240, 240);
+    --bg-code: rgb(250, 250, 250);
+    --text-primary: rgb(30, 30, 30);
+    --border-color: #999;
+  }
 }
